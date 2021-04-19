@@ -73,9 +73,10 @@ class GeoJsonTransformer():
             return self._elevations_list
 
         elevations_list = []
-        for element in self.root.iter('ele'):
-            ele = int(round(float(element.text)))
-            elevations_list.append(ele)
+        for element in self.root.iter('trkpt'):
+            ele = element.findtext('ele')
+            if ele:
+                elevations_list.append(float(ele))
         self._elevations_list = elevations_list
         return self._elevations_list
 
@@ -90,7 +91,7 @@ class GeoJsonTransformer():
         return self._paired_data
 
     def make_geojson(self):
-        with open('src/configs.json') as f:
+        with open('configs.json') as f:
             schema = json.load(f)
             schema["features"][0]["properties"]["name"] = self.name
             schema["features"][0]["geometry"]["coordinates"].extend(self.paired_data)
@@ -104,11 +105,12 @@ class GeoJsonTransformer():
 
         el = self.elevation_list
         total_elevation = 0
-        elevation_pairs = list(zip(el[::2], el[1::2]))
+        elevation_pairs = list(zip(el[0:], el[1:]))
         for e in elevation_pairs:
             if e[1] > e[0]:
-                total_elevation += e[1]-e[0]
-        self._total_elevation = total_elevation
+                diff = e[1]-e[0]
+                total_elevation += diff
+        self._total_elevation = int(total_elevation)
         return self._total_elevation
 
 
@@ -133,9 +135,7 @@ class GeoJsonTransformer():
         filepath[-1] = 'json'
         filepath = '.'.join(filepath)
         with open(filepath, 'w') as outfile:
-            filepath = filepath.split('.')
-            filepath[-1] = 'json'
-            filepath = '.'.join(filepath)
             json.dump(self.make_geojson(), outfile)
 
-
+myfile = GeoJsonTransformer(path='Balkan_Ultra.gpx')
+myfile.save_geojson()
