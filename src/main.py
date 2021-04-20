@@ -16,8 +16,11 @@ class GeoJsonTransformer():
         self._elevations_list = None
         self._total_distance = None
         self._total_elevation = None
+        self._starting_point = None
         self._paired_data = None
-    
+        self.prepare_data = self.setup_lists()
+
+
     @property
     def name(self):
         if self._name:
@@ -127,6 +130,14 @@ class GeoJsonTransformer():
         self._total_distance = round(total_distance, 2)
         return self._total_distance
 
+    @property
+    def starting_point(self):
+        if self._starting_point:
+            return self._starting_point
+
+        self._starting_point = (self.coordinates_list[0], self.coordinates_list[1])
+        return self._starting_point
+
     def save_geojson(self, filepath=None):
         if not filepath:
             filepath = self.path
@@ -136,6 +147,14 @@ class GeoJsonTransformer():
         filepath = '.'.join(filepath)
         with open(filepath, 'w') as outfile:
             json.dump(self.make_geojson(), outfile)
+            return outfile
 
-myfile = GeoJsonTransformer(path='Balkan_Ultra.gpx')
-myfile.save_geojson()
+    def setup_lists(self):
+        if self.file:
+            self.coordinates_list
+            self.file.seek(0)
+            self.elevation_list
+            self.file.seek(0)
+        elif self.path:
+            self.coordinates_list
+            self.elevation_list
