@@ -1,11 +1,17 @@
 import os
 
 from lxml import etree
-from utils import haversine
+from .utils import haversine
 import json
 
 
 class GeoJsonTransformer():
+    """A class to represent geo location object from GPX file.
+
+    Provides functionality to extract data from a GPX file.
+    A GPX file can be transformed to a GeoJson object.
+    """
+
     def __init__(self, path=None, in_memory_file=None):
         self.path = path
         self.file = in_memory_file
@@ -59,6 +65,8 @@ class GeoJsonTransformer():
 
     @property
     def coordinates_list(self):
+        """Returns a list of (lon, lat) pairs."""
+        
         if self._coordinates_list:
             return self._coordinates_list
 
@@ -72,6 +80,8 @@ class GeoJsonTransformer():
 
     @property
     def elevation_list(self):
+        """Returns a list of object elevation data."""
+
         if self._elevations_list:
             return self._elevations_list
 
@@ -85,6 +95,8 @@ class GeoJsonTransformer():
 
     @property
     def paired_data(self):
+        """Returns the object data paired in a list of (lat, lon, elevation) pairs."""
+
         if self._paired_data:
             return self._paired_data
 
@@ -93,7 +105,7 @@ class GeoJsonTransformer():
         self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
         return self._paired_data
 
-    def make_geojson(self):
+    def _make_geojson(self):
         with open('configs.json') as f:
             schema = json.load(f)
             schema["features"][0]["properties"]["name"] = self.name
@@ -103,6 +115,8 @@ class GeoJsonTransformer():
     
     @property
     def total_elevation(self):
+        """Returns the total positive gain in elevation as an int."""
+
         if self._total_elevation:
             return self._total_elevation
 
@@ -119,6 +133,8 @@ class GeoJsonTransformer():
 
     @property
     def total_distance(self):
+        """Returns the sum between all coordinate points in the object."""
+
         if self._total_distance:
             return self._total_distance
 
@@ -132,6 +148,8 @@ class GeoJsonTransformer():
 
     @property
     def starting_point(self):
+        """Returns the first lat/lon pair found in the object."""
+
         if self._starting_point:
             return self._starting_point
 
@@ -139,6 +157,8 @@ class GeoJsonTransformer():
         return self._starting_point
 
     def save_geojson(self, filepath=None):
+        """Creates a GeoJson file at the specified filepath. Returns the object as json."""
+
         if not filepath:
             filepath = self.path
             
@@ -146,10 +166,12 @@ class GeoJsonTransformer():
         filepath[-1] = 'json'
         filepath = '.'.join(filepath)
         with open(filepath, 'w') as outfile:
-            json.dump(self.make_geojson(), outfile)
+            json.dump(self._make_geojson(), outfile)
             return outfile
 
     def setup_lists(self):
+        """Loads up initial data into the object."""
+
         if self.file:
             self.coordinates_list
             self.file.seek(0)
