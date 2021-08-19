@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="GlobalMotionEditor" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+<metadata>
+<name>gpx file short</name>
+<time>2018-01-07T00:00:00Z</time>
+</metadata>
+<trk>
+    <trkseg>
+        <trkpt lat="42.59468181547034" lon="23.250621557235718"><ele>1737.71</ele><time></time></trkpt>
+        <trkpt lat="42.59461863032628" lon="23.250718116760254"><ele>1740.42</ele><time></time></trkpt>
+        <trkpt lat="42.59451990341043" lon="23.250889778137207"><ele>1744.88</ele><time></time></trkpt>
+        <trkpt lat="42.59442907450971" lon="23.250980973243713"><ele>1747.91</ele><time></time></trkpt>
+    </trkseg>
+</trk>
+</gpx>
