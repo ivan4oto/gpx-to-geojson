@@ -16,7 +16,8 @@ class GeoJsonTransformer():
         self._elevations_list = None
         self._total_distance = None
         self._total_elevation = None
-        self._paired_data = None
+        self._point_ele_pairs = None
+        self._ele_distance_pairs = None
     
     @property
     def name(self):
@@ -80,14 +81,27 @@ class GeoJsonTransformer():
         return self._elevations_list
 
     @property
-    def paired_data(self):
-        if self._paired_data:
-            return self._paired_data
+    def point_ele_pairs(self):
+        if self._point_ele_pairs:
+            return self._point_ele_pairs
 
         elevations_list = self.elevation_list
         coordinates_list = self.coordinates_list
-        self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
-        return self._paired_data
+        self._point_ele_pairs = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
+        return self._point_ele_pairs
+
+    @property
+    def ele_distance_pairs(self):
+        if self._ele_distance_pairs:
+            return self._ele_distance_pairs
+
+        cl = self.coordinates_list
+        lines = list(zip(cl[::2], cl[1::2], cl[2::2], cl[3::2]))
+        distance_steps = [0]
+        for line in lines:
+            distance_steps.append(distance_steps[-1] + round(haversine(line[0], line[1], line[2], line[3]), 2))            
+        return list(zip(self.elevation_list, distance_steps))
+
 
     def make_geojson(self):
         with open('src/configs.json') as f:
@@ -137,5 +151,3 @@ class GeoJsonTransformer():
             filepath[-1] = 'json'
             filepath = '.'.join(filepath)
             json.dump(self.make_geojson(), outfile)
-
-
