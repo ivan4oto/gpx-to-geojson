@@ -15,7 +15,7 @@ pip install gpx-to-geojson
 ## Usage
 
 ```python
-from gpx-to-geojson import GeoJsonTransformer
+from gpx_geojson_py import GeoJsonTransformer
 
 # Create an object from a gpx file.
 gpxfile = GeoJsonTransformer(path='path/to/my_gpx_file.gpx') 
