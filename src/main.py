@@ -11,7 +11,6 @@ class GeoJsonTransformer():
     Provides functionality to extract data from a GPX file.
     A GPX file can be transformed to a GeoJson object.
     """
-
     def __init__(self, path=None, in_memory_file=None):
         self.path = path
         self.file = in_memory_file
@@ -26,7 +25,8 @@ class GeoJsonTransformer():
         self._ele_distance_pairs = None
         self._starting_point = None
         self._paired_data = None
-        self.prepare_data = self.setup_lists()
+
+        self.prepare_data = self.setup_lists() if path or in_memory_file else None
 
 
     @property
@@ -46,7 +46,7 @@ class GeoJsonTransformer():
     
     @property
     def tree(self):
-        if self.path:            
+        if self.path:
             with open(self.path, 'r') as f:
                 tree = etree.parse(f, self.parser)
                 tree = self.strip_ns_prefix(tree)
@@ -96,17 +96,9 @@ class GeoJsonTransformer():
         return self._elevations_list
 
     @property
-<<<<<<< HEAD
     def point_ele_pairs(self):
         if self._point_ele_pairs:
             return self._point_ele_pairs
-=======
-    def paired_data(self):
-        """Returns the object data paired in a list of (lat, lon, elevation) pairs."""
-
-        if self._paired_data:
-            return self._paired_data
->>>>>>> 7839bb07cde6cc39947f9b9253abf290056f1867
 
         elevations_list = self.elevation_list
         coordinates_list = self.coordinates_list
@@ -124,7 +116,6 @@ class GeoJsonTransformer():
         for line in lines:
             distance_steps.append(distance_steps[-1] + round(haversine(line[0], line[1], line[2], line[3]), 2))            
         return list(zip(self.elevation_list, distance_steps))
-
 
     def _make_geojson(self):
         with open('configs.json') as f:
@@ -150,7 +141,6 @@ class GeoJsonTransformer():
                 total_elevation += diff
         self._total_elevation = int(total_elevation)
         return self._total_elevation
-
 
     @property
     def total_distance(self):
