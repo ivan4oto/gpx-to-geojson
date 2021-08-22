@@ -1,4 +1,4 @@
-# gpx-to-geojson
+# gpx_geojson_py
 
 A python library for transforming GPX data to GeoJSON format.
 It also gives you the ability to extract data from the gpx file such as:
@@ -9,7 +9,7 @@ Total elevation, total distance, starting point, paired data.
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
 
 ```bash
-pip install gpx-to-geojson
+pip install gpx_geojson_py
 ```
 
 ## Usage

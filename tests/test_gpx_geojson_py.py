@@ -1,5 +1,5 @@
 import unittest
-from src.main import GeoJsonTransformer
+from src.gpx_geojson_py import GeoJsonTransformer
 
 
 class GeoJsonTransformerTestCase(unittest.TestCase):
