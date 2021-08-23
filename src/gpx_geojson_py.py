@@ -1,7 +1,7 @@
 import os
 
 from lxml import etree
-from .utils import haversine
+import utils
 import json
 
 
@@ -96,15 +96,23 @@ class GeoJsonTransformer():
         return self._elevations_list
 
     @property
-    def point_ele_pairs(self):
-        if self._point_ele_pairs:
-            return self._point_ele_pairs
+    def paired_data(self):
+        """Returns the object data paired in a list of (lat, lon, elevation) pairs."""
 
+        if self._paired_data:
+            return self._paired_data
         elevations_list = self.elevation_list
         coordinates_list = self.coordinates_list
         self._point_ele_pairs = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
         return self._point_ele_pairs
 
+    @property
+    def point_ele_pairs(self):
+        if self._point_ele_pairs:
+            return self._point_ele_pairs
+        self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
+        return self._paired_data
+        
     @property
     def ele_distance_pairs(self):
         if self._ele_distance_pairs:
@@ -114,11 +122,11 @@ class GeoJsonTransformer():
         lines = list(zip(cl[::2], cl[1::2], cl[2::2], cl[3::2]))
         distance_steps = [0]
         for line in lines:
-            distance_steps.append(distance_steps[-1] + round(haversine(line[0], line[1], line[2], line[3]), 2))            
+            distance_steps.append(distance_steps[-1] + round(utils.haversine(line[0], line[1], line[2], line[3]), 2))            
         return list(zip(self.elevation_list, distance_steps))
 
     def _make_geojson(self):
-        with open('configs.json') as f:
+        with open('./configs.json') as f:
             schema = json.load(f)
             schema["features"][0]["properties"]["name"] = self.name
             schema["features"][0]["geometry"]["coordinates"].extend(self.paired_data)
@@ -153,7 +161,7 @@ class GeoJsonTransformer():
         total_distance = 0
         lines = list(zip(cl[::2], cl[1::2], cl[2::2], cl[3::2]))
         for line in lines:
-            total_distance += haversine(line[0], line[1], line[2], line[3])
+            total_distance += utils.haversine(line[0], line[1], line[2], line[3])
         self._total_distance = round(total_distance, 2)
         return self._total_distance
 
