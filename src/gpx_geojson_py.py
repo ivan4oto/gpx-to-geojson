@@ -1,7 +1,8 @@
 import os
-
+import csv
+import json
 from lxml import etree
-import utils
+from .utils.utils import haversine
 import json
 
 
@@ -11,6 +12,9 @@ class GeoJsonTransformer():
     Provides functionality to extract data from a GPX file.
     A GPX file can be transformed to a GeoJson object.
     """
+
+    CONFIG_JSON_PATH = 'src/configs.json'
+
     def __init__(self, path=None, in_memory_file=None):
         self.path = path
         self.file = in_memory_file
@@ -21,7 +25,6 @@ class GeoJsonTransformer():
         self._elevations_list = None
         self._total_distance = None
         self._total_elevation = None
-        self._point_ele_pairs = None
         self._ele_distance_pairs = None
         self._starting_point = None
         self._paired_data = None
@@ -67,7 +70,7 @@ class GeoJsonTransformer():
 
     @property
     def coordinates_list(self):
-        """Returns a list of (lon, lat) pairs."""
+        """Returns a list of lon, lat data."""
         
         if self._coordinates_list:
             return self._coordinates_list
@@ -103,18 +106,14 @@ class GeoJsonTransformer():
             return self._paired_data
         elevations_list = self.elevation_list
         coordinates_list = self.coordinates_list
-        self._point_ele_pairs = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
-        return self._point_ele_pairs
-
-    @property
-    def point_ele_pairs(self):
-        if self._point_ele_pairs:
-            return self._point_ele_pairs
         self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
         return self._paired_data
-        
+
     @property
     def ele_distance_pairs(self):
+        """Returns list of elevation, distance pairs where each tuple contains
+           current elevation and total distance up to that point.
+        """
         if self._ele_distance_pairs:
             return self._ele_distance_pairs
 
@@ -122,11 +121,11 @@ class GeoJsonTransformer():
         lines = list(zip(cl[::2], cl[1::2], cl[2::2], cl[3::2]))
         distance_steps = [0]
         for line in lines:
-            distance_steps.append(distance_steps[-1] + round(utils.haversine(line[0], line[1], line[2], line[3]), 2))            
+            distance_steps.append(distance_steps[-1] + round(haversine(line[0], line[1], line[2], line[3]), 2))            
         return list(zip(self.elevation_list, distance_steps))
 
     def _make_geojson(self):
-        with open('./configs.json') as f:
+        with open(self.CONFIG_JSON_PATH) as f:
             schema = json.load(f)
             schema["features"][0]["properties"]["name"] = self.name
             schema["features"][0]["geometry"]["coordinates"].extend(self.paired_data)
@@ -161,7 +160,7 @@ class GeoJsonTransformer():
         total_distance = 0
         lines = list(zip(cl[::2], cl[1::2], cl[2::2], cl[3::2]))
         for line in lines:
-            total_distance += utils.haversine(line[0], line[1], line[2], line[3])
+            total_distance += haversine(line[0], line[1], line[2], line[3])
         self._total_distance = round(total_distance, 2)
         return self._total_distance
 
@@ -177,16 +176,35 @@ class GeoJsonTransformer():
 
     def save_geojson(self, filepath=None):
         """Creates a GeoJson file at the specified filepath. Returns the object as json."""
-
         if not filepath:
-            filepath = self.path
-            
+            filepath = self.name + '.json' # TODO: find a better way for that
         filepath = filepath.split('.')
         filepath[-1] = 'json'
         filepath = '.'.join(filepath)
+        
         with open(filepath, 'w') as outfile:
             json.dump(self._make_geojson(), outfile)
             return outfile
+
+    def to_csv(self, filepath=None):
+        """
+        Creates a csv file that has two rows 'elevation' and 'distance'.
+        Each row has the current elevation and total distance up to that point.        
+        """
+        if not filepath:
+            filepath = self.name + '.csv' # TODO: find a better way for that
+        filepath = filepath.split('.')
+        filepath[-1] = 'csv'
+        filepath = '.'.join(filepath)
+
+        with open(filepath, 'w', newline='') as csvfile:
+            eledistancewriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            eledistancewriter.writerow(['elevation', 'distance'])
+            for pair in self.ele_distance_pairs:
+                eledistancewriter.writerow(list(pair))
+            return csvfile
+        
+
 
     def setup_lists(self):
         """Loads up initial data into the object."""
