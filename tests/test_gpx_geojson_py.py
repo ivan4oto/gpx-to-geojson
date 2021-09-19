@@ -3,8 +3,8 @@ import csv
 import unittest
 import tempfile
 import os
-from tests.fixtures.example_data import ExpectedData
-from src.gpx_geojson_py import GeoJsonTransformer
+from .fixtures.example_data import ExpectedData
+from ..src.gpx_geojson_py import GeoJsonTransformer
 
 
 class GeoJsonTransformerTestCase(unittest.TestCase):
