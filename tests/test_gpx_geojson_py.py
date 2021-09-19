@@ -3,7 +3,7 @@ import csv
 import unittest
 import tempfile
 import os
-from .fixtures.example_data import ExpectedData
+from tests.fixtures.example_data import ExpectedData
 from src.gpx_geojson_py import GeoJsonTransformer
 
 
@@ -106,8 +106,6 @@ class GeoJsonTransformerTestCase(unittest.TestCase):
         finally:
             csv_file.close()
             os.remove(temp_filepath[1])
-
-
 
 
 if __name__ == '__main__':
