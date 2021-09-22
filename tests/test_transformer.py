@@ -4,7 +4,7 @@ import unittest
 import tempfile
 import os
 from .fixtures.example_data import ExpectedData
-from ..src.gpx_geojson_py import GeoJsonTransformer
+from ..src.geojson_transformer import GeoJsonTransformer
 
 
 class GeoJsonTransformerTestCase(unittest.TestCase):
@@ -89,7 +89,6 @@ class GeoJsonTransformerTestCase(unittest.TestCase):
             result_dict = json.load(test_geojson)
             self.assertEqual(ExpectedData().GEOJSON_DICT, result_dict)
         finally:
-            test_geojson.close()
             os.remove(temp_filepath[1])
 
     def test_to_csv(self):

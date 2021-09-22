@@ -1,4 +1,4 @@
-# gpx_geojson_py
+# geojson_transformer
 
 A python library for transforming GPX data to GeoJSON format.
 It also gives you the ability to extract data from the gpx file such as:
@@ -6,16 +6,16 @@ Total elevation, total distance, starting point, paired data.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install geojson_transformer.
 
 ```bash
-pip install gpx_geojson_py
+pip install geojson_transformer
 ```
 
 ## Usage
 
 ```python
-from gpx_geojson_py import GeoJsonTransformer
+from geojson_transformer import GeoJsonTransformer
 
 # Create an object from a gpx file.
 gpxfile = GeoJsonTransformer(path='path/to/my_gpx_file.gpx') 

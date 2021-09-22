@@ -2,7 +2,7 @@ import os
 import csv
 import json
 from lxml import etree
-from .utils.utils import haversine
+from utils.geo_utils import haversine
 import json
 
 
@@ -13,7 +13,7 @@ class GeoJsonTransformer():
     A GPX file can be transformed to a GeoJson object.
     """
 
-    CONFIG_JSON_PATH = 'src/configs.json'
+    CONFIG_JSON_PATH = 'src/geojson_transformer/config.json'
 
     def __init__(self, path=None, in_memory_file=None):
         self.path = path
