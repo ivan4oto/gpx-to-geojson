@@ -121,8 +121,8 @@ class GeoJsonTransformer():
         lines = list(zip(cl[::2], cl[1::2], cl[2::2], cl[3::2]))
         distance_steps = [0]
         for line in lines:
-            distance_steps.append(distance_steps[-1] + round(haversine(line[0], line[1], line[2], line[3]), 2))            
-        return list(zip(self.elevation_list, distance_steps))
+            distance_steps.append(distance_steps[-1] + haversine(line[0], line[1], line[2], line[3]))            
+        return list(zip(distance_steps, self.elevation_list))
 
     def _make_geojson(self):
         with open(self.CONFIG_JSON_PATH) as f:
@@ -199,10 +199,12 @@ class GeoJsonTransformer():
 
         with open(filepath, 'w', newline='') as csvfile:
             eledistancewriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            eledistancewriter.writerow(['elevation', 'distance'])
+            eledistancewriter.writerow(['distance', 'elevation'])
             for pair in self.ele_distance_pairs:
-                eledistancewriter.writerow(list(pair))
+                eledistancewriter.writerow([round(pair[0], 2), round(pair[1], 2)])
+        if csvfile:
             return csvfile
+        return None
         
 
 
