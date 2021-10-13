@@ -9,7 +9,7 @@ Total elevation, total distance, starting point, paired data.
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install geojson_transformer.
 
 ```bash
-pip install geojson_transformer
+pip install geojson-transformer
 ```
 
 ## Usage
