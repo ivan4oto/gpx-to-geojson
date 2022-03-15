@@ -4,6 +4,7 @@ import json
 from lxml import etree
 from utils.geo_utils import haversine
 import json
+from io import StringIO
 
 
 class GeoJsonTransformer():
@@ -76,7 +77,9 @@ class GeoJsonTransformer():
             return self._coordinates_list
 
         coordinates_list = []
-        for element in self.root.iter('trkpt'):
+        elements = [e for e in self.root.iter('trkpt')]
+        elements = elements if elements else [e for e in self.root.iter('rtept')]
+        for element in elements:
             lon = float(element.attrib.get('lon'))
             lat = float(element.attrib.get('lat'))
             coordinates_list.extend([lon, lat])
@@ -174,19 +177,24 @@ class GeoJsonTransformer():
         self._starting_point = (self.coordinates_list[0], self.coordinates_list[1])
         return self._starting_point
 
-    def save_geojson(self, filepath=None):
+    def save_geojson(self, filepath=None, save_file=True):
         """Creates a GeoJson file at the specified filepath. Returns the object as json."""
         if not filepath:
             filepath = self.name + '.json' # TODO: find a better way for that
         filepath = filepath.split('.')
         filepath[-1] = 'json'
         filepath = '.'.join(filepath)
-        
-        with open(filepath, 'w') as outfile:
-            json.dump(self._make_geojson(), outfile)
-            return outfile
+        if save_file:
+            with open(filepath, 'w') as outfile:
+                json.dump(self._make_geojson(), outfile)
+                return outfile
+        else:
+            io = StringIO()
+            json.dump(self._make_geojson(), io)
+            return io
 
-    def to_csv(self, filepath=None):
+
+    def to_csv(self, filepath=None, save_file=True):
         """
         Creates a csv file that has two rows 'elevation' and 'distance'.
         Each row has the current elevation and total distance up to that point.        
@@ -196,16 +204,20 @@ class GeoJsonTransformer():
         filepath = filepath.split('.')
         filepath[-1] = 'csv'
         filepath = '.'.join(filepath)
-
-        with open(filepath, 'w', newline='') as csvfile:
-            eledistancewriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        if save_file:
+            with open(filepath, 'w', newline='') as csvfile:
+                eledistancewriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                eledistancewriter.writerow(['distance', 'elevation'])
+                for pair in self.ele_distance_pairs:
+                    eledistancewriter.writerow([round(pair[0], 2), round(pair[1], 2)])
+            return save_file
+        else:
+            io = StringIO()
+            eledistancewriter = csv.writer(io, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             eledistancewriter.writerow(['distance', 'elevation'])
             for pair in self.ele_distance_pairs:
                 eledistancewriter.writerow([round(pair[0], 2), round(pair[1], 2)])
-        if csvfile:
-            return csvfile
-        return None
-        
+            return io
 
 
     def setup_lists(self):
