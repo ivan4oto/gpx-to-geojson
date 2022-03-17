@@ -4,7 +4,7 @@ import json
 from lxml import etree
 from utils.geo_utils import haversine
 import json
-from io import StringIO
+from io import BytesIO, StringIO
 
 
 class GeoJsonTransformer():
@@ -14,7 +14,7 @@ class GeoJsonTransformer():
     A GPX file can be transformed to a GeoJson object.
     """
 
-    CONFIG_JSON_PATH = 'src/geojson_transformer/config.json'
+    CONFIG_JSON_PATH = os.path.join(os.path.dirname(__file__), '.', 'config.json')
 
     def __init__(self, path=None, in_memory_file=None):
         self.path = path
@@ -177,8 +177,8 @@ class GeoJsonTransformer():
         self._starting_point = (self.coordinates_list[0], self.coordinates_list[1])
         return self._starting_point
 
-    def save_geojson(self, filepath=None, save_file=True):
-        """Creates a GeoJson file at the specified filepath. Returns the object as json."""
+    def save_geojson(self, filepath=None, save_file=True, bytes=False):
+        """Creates a GeoJson file at the specified filepath."""
         if not filepath:
             filepath = self.name + '.json' # TODO: find a better way for that
         filepath = filepath.split('.')
@@ -189,6 +189,12 @@ class GeoJsonTransformer():
                 json.dump(self._make_geojson(), outfile)
                 return outfile
         else:
+            if bytes:
+                with BytesIO() as io:
+                    io.write(json.dumps(self._make_geojson()).encode())
+                    io.seek(0)
+                    return io.read()
+            
             io = StringIO()
             json.dump(self._make_geojson(), io)
             return io
