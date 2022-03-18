@@ -177,7 +177,7 @@ class GeoJsonTransformer():
         self._starting_point = (self.coordinates_list[0], self.coordinates_list[1])
         return self._starting_point
 
-    def save_geojson(self, filepath=None, save_file=True, bytes=False):
+    def save_geojson(self, filepath=None, save_file=True, bytes_like=False):
         """Creates a GeoJson file at the specified filepath."""
         if not filepath:
             filepath = self.name + '.json' # TODO: find a better way for that
@@ -189,7 +189,7 @@ class GeoJsonTransformer():
                 json.dump(self._make_geojson(), outfile)
                 return outfile
         else:
-            if bytes:
+            if bytes_like:
                 with BytesIO() as io:
                     io.write(json.dumps(self._make_geojson()).encode())
                     io.seek(0)

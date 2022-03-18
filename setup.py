@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="geojson_transformer",
-    version="0.0.6",
+    version="0.0.7",
     author="Ivan Gochev",
     author_email="ivan.gotchev94@gmail.comm",
     description="Tool for extracting data from geojson or gpx files",
