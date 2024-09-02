@@ -109,7 +109,10 @@ class GeoJsonTransformer():
             return self._paired_data
         elevations_list = self.elevation_list
         coordinates_list = self.coordinates_list
-        self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
+        if len(elevations_list) == 0:
+            self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2])]
+        else:    
+            self._paired_data = [list(z) for z in zip(coordinates_list[::2], coordinates_list[1::2], elevations_list)]
         return self._paired_data
 
     @property
